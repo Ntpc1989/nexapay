@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-
-const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY;
-
-const BASE_RPC_URL = `https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`;
+import { getBaseTransactions } from "@/services/transactions/base";
+import { getEthereumTransactions } from "@/services/transactions/ethereum";
 
 export async function GET(request: NextRequest) {
   try {
@@ -19,51 +17,21 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const response = await fetch(BASE_RPC_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id: 1,
-        jsonrpc: "2.0",
-        method: "alchemy_getAssetTransfers",
-        params: [
-          {
-            fromBlock: "0x0",
-            toBlock: "latest",
-            withMetadata: true,
-            excludeZeroValue: true,
-            category: [
-              "external",
-              "erc20",
-            ],
-            maxCount: "0xA",
-            fromAddress: address,
-          },
-        ],
-      }),
-      cache: "no-store",
-    });
+    const [baseTransactions, ethereumTransactions] = await Promise.all([
+      getBaseTransactions(address),
+      getEthereumTransactions(address),
+    ]);
 
-    const data = await response.json();
-
-    console.log("Alchemy Response:", data);
-
-    if (!response.ok) {
-      return NextResponse.json(
-        {
-          error: data,
-        },
-        {
-          status: response.status,
-        }
-      );
-    }
-
-    return NextResponse.json(
-      data.result?.transfers ?? []
+    const transactions = [
+      ...baseTransactions,
+      ...ethereumTransactions,
+    ].sort(
+      (a, b) =>
+        new Date(b.metadata.blockTimestamp).getTime() -
+        new Date(a.metadata.blockTimestamp).getTime()
     );
+
+    return NextResponse.json(transactions);
   } catch (error: any) {
     console.error("Server Error:", error);
 

@@ -1,6 +1,7 @@
 "use client";
 
 import Card from "@/components/ui/Card";
+import { formatRelativeTime } from "@/lib/date";
 import { useTransactions } from "@/hooks/useTransactions";
 
 export function TransactionHistory() {
@@ -40,9 +41,7 @@ export function TransactionHistory() {
                   </h3>
 
                   <p className="mt-2 text-sm text-zinc-500">
-                    {new Date(
-                      tx.metadata.blockTimestamp
-                    ).toLocaleString()}
+                    {formatRelativeTime(tx.metadata.blockTimestamp)}
                   </p>
                 </div>
 
