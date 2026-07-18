@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { getBaseTransactions } from "@/services/transactions/base";
 import { getEthereumTransactions } from "@/services/transactions/ethereum";
+import { getPolygonTransactions } from "@/services/transactions/polygon";
+import { getArbitrumTransactions } from "@/services/transactions/arbitrum";
+import { getOptimismTransactions } from "@/services/transactions/optimism";
 
 export async function GET(request: NextRequest) {
   try {
@@ -17,14 +21,26 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const [baseTransactions, ethereumTransactions] = await Promise.all([
+    const [
+      baseTransactions,
+      ethereumTransactions,
+      polygonTransactions,
+      arbitrumTransactions,
+      optimismTransactions,
+    ] = await Promise.all([
       getBaseTransactions(address),
       getEthereumTransactions(address),
+      getPolygonTransactions(address),
+      getArbitrumTransactions(address),
+      getOptimismTransactions(address),
     ]);
 
     const transactions = [
       ...baseTransactions,
       ...ethereumTransactions,
+      ...polygonTransactions,
+      ...arbitrumTransactions,
+      ...optimismTransactions,
     ].sort(
       (a, b) =>
         new Date(b.metadata.blockTimestamp).getTime() -

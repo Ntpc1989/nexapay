@@ -9,54 +9,67 @@ export async function getAlchemyTransactions(
 ): Promise<Transaction[]> {
   const rpcUrl = `https://${network}.g.alchemy.com/v2/${ALCHEMY_API_KEY}`;
 
-  const response = await fetch(rpcUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      id: 1,
-      jsonrpc: "2.0",
-      method: "alchemy_getAssetTransfers",
-      params: [
-        {
-          fromBlock: "0x0",
-          toBlock: "latest",
-          withMetadata: true,
-          excludeZeroValue: true,
-          category: [
-            "external",
-            "erc20",
-          ],
-          maxCount: "0xA",
-          fromAddress: address,
-        },
-      ],
-    }),
-    cache: "no-store",
-  });
+  async function fetchTransfers(direction: "from" | "to") {
+    const response = await fetch(rpcUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+      body: JSON.stringify({
+        id: 1,
+        jsonrpc: "2.0",
+        method: "alchemy_getAssetTransfers",
+        params: [
+          {
+            fromBlock: "0x0",
+            toBlock: "latest",
+            withMetadata: true,
+            excludeZeroValue: true,
+            category: ["external", "erc20"],
+            maxCount: "0x64",
+            ...(direction === "from"
+              ? { fromAddress: address }
+              : { toAddress: address }),
+          },
+        ],
+      }),
+    });
 
-  if (!response.ok) {
-    const text = await response.text();
+    if (!response.ok) {
+      console.error(`${chain} ${direction} request failed`);
+      return [];
+    }
 
-    console.error(`${chain} request failed`);
-    console.error(text);
+    const data = await response.json();
 
-    return [];
+    if (data.error) {
+      console.error(data.error);
+      return [];
+    }
+
+    return data.result?.transfers ?? [];
   }
 
-  const data = await response.json();
+  const [outgoing, incoming] = await Promise.all([
+    fetchTransfers("from"),
+    fetchTransfers("to"),
+  ]);
 
-  if (data.error) {
-    console.error(`${chain} Alchemy error`);
-    console.error(data.error);
+  const merged = [...outgoing, ...incoming];
 
-    return [];
-  }
+  // Remove duplicate transactions using hash + chain
+  const unique = merged.filter(
+    (tx: any, index: number, self: any[]) =>
+      index ===
+      self.findIndex(
+        (t) =>
+          t.hash === tx.hash &&
+          t.category === tx.category
+      )
+  );
 
-  const transfers = data.result?.transfers ?? [];
-
-  return transfers.map((tx: any) => ({
+  return unique.map((tx: any) => ({
     ...tx,
     chain,
   }));

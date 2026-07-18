@@ -1,9 +1,9 @@
 import { getAlchemyTransactions } from "./alchemy";
 
-export function getEthereumTransactions(address: string) {
+export function getArbitrumTransactions(address: string) {
   return getAlchemyTransactions(
-    "eth-mainnet",
-    "Ethereum",
+    "arb-mainnet",
+    "Arbitrum",
     address
   );
 }
