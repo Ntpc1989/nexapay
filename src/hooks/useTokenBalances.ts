@@ -68,6 +68,9 @@ export function useTokenBalances() {
 
   const balances = tokens.map((token, index) => ({
     symbol: token.symbol,
+    address: token.address,
+    decimals: token.decimals,
+    chainId: wallet.chain?.id ?? 1,
     balance:
       data?.[index]?.status === "success"
         ? formatUnits(data[index].result, token.decimals)

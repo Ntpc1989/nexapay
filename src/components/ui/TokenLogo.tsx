@@ -1,48 +1,54 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type TokenLogoProps = {
   symbol: string;
+  address?: string;
+  chainId?: number;
   size?: number;
-};
-
-const LOGOS: Record<string, string> = {
-  ETH: "279",
-  WETH: "279",
-  BTC: "1",
-  WBTC: "7598",
-  USDC: "6319",
-  USDT: "325",
-  DAI: "9956",
-  MATIC: "4713",
-  POL: "32440",
-  OP: "25244",
-  ARB: "16547",
-  LINK: "877",
-  UNI: "12504",
-  AAVE: "12645",
-  PEPE: "29850",
-  SHIB: "11939",
 };
 
 export default function TokenLogo({
   symbol,
+  address,
+  chainId,
   size = 40,
 }: TokenLogoProps) {
-  const [error, setError] = useState(false);
+  const [logo, setLogo] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
 
-  const id = LOGOS[symbol.toUpperCase()];
+  useEffect(() => {
+    if (!address || !chainId) return;
 
-  if (id && !error) {
+    async function loadLogo() {
+      try {
+        const res = await fetch(
+          `/api/token-logo?address=${address}&chainId=${chainId}`
+        );
+
+        const data = await res.json();
+
+        if (data.logo) {
+          setLogo(data.logo);
+        }
+      } catch {
+        setLogo(null);
+      }
+    }
+
+    loadLogo();
+  }, [address, chainId]);
+
+  if (logo && !failed) {
     return (
       <img
-        src={`https://assets.coingecko.com/coins/images/${id}/small.png`}
+        src={logo}
         alt={symbol}
         width={size}
         height={size}
-        className="rounded-full"
-        onError={() => setError(true)}
+        className="rounded-full bg-white"
+        onError={() => setFailed(true)}
       />
     );
   }
@@ -56,7 +62,7 @@ export default function TokenLogo({
         fontSize: size * 0.4,
       }}
     >
-      {symbol.charAt(0).toUpperCase()}
+      {symbol.slice(0, 2).toUpperCase()}
     </div>
   );
 }

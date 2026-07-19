@@ -36,6 +36,8 @@ export function PortfolioCard() {
         symbol: nativeSymbol,
         balance: nativeBalance,
         value: nativeBalance * nativePrice,
+        address: undefined,
+        chainId: wallet.chain?.id,
       },
 
       ...balances.map((token) => {
@@ -62,6 +64,8 @@ export function PortfolioCard() {
           symbol: token.symbol,
           balance,
           value: balance * price,
+          address: token.address,
+          chainId: token.chainId,
         };
       }),
     ];
@@ -75,6 +79,7 @@ export function PortfolioCard() {
     nativePrice,
     nativeSymbol,
     prices,
+    wallet.chain?.id,
   ]);
 
   const totalValue = portfolio.reduce(
@@ -82,7 +87,6 @@ export function PortfolioCard() {
     0
   );
 
-  // Temporary 24h estimate
   const previousValue = totalValue * 0.975;
 
   const topAsset = portfolio[0];
@@ -162,15 +166,9 @@ export function PortfolioCard() {
           <div className="mt-6 overflow-hidden rounded-2xl border border-zinc-800">
             <div className="grid grid-cols-[2fr_1fr_1fr_1fr] border-b border-zinc-800 bg-zinc-900 px-5 py-4 text-sm font-semibold text-zinc-400">
               <span>Asset</span>
-              <span className="text-center">
-                Balance
-              </span>
-              <span className="text-right">
-                Value
-              </span>
-              <span className="text-right">
-                Allocation
-              </span>
+              <span className="text-center">Balance</span>
+              <span className="text-right">Value</span>
+              <span className="text-right">Allocation</span>
             </div>
 
             {(loading || isLoading) && (
@@ -195,6 +193,8 @@ export function PortfolioCard() {
                     <div className="flex items-center gap-3">
                       <TokenLogo
                         symbol={token.symbol}
+                        address={token.address}
+                        chainId={token.chainId}
                         size={38}
                       />
 
