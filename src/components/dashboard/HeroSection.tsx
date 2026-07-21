@@ -1,5 +1,12 @@
 "use client";
 
+import Link from "next/link";
+import {
+  ArrowUpRight,
+  ArrowDownLeft,
+  RefreshCw,
+} from "lucide-react";
+
 import { WalletConnectButton } from "@/components/wallet/WalletConnectButton";
 
 export function HeroSection() {
@@ -14,7 +21,7 @@ export function HeroSection() {
       <div className="absolute inset-0 bg-gradient-to-br from-sky-500/[0.05] via-transparent to-violet-500/[0.05]" />
 
       <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
-        <div>
+        <div className="max-w-3xl">
           <span className="inline-flex rounded-full border border-sky-400/20 bg-sky-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.25em] text-sky-300">
             Built on Arc
           </span>
@@ -23,7 +30,7 @@ export function HeroSection() {
             NexaPay
           </h1>
 
-          <p className="mt-4 max-w-2xl text-zinc-300">
+          <p className="mt-4 text-zinc-300">
             Securely manage your digital assets across multiple networks with a
             modern dashboard optimized for the Arc ecosystem.
           </p>
@@ -40,6 +47,33 @@ export function HeroSection() {
             <span className="rounded-full border border-violet-500/30 bg-violet-500/10 px-4 py-2 text-sm text-violet-300">
               🚀 Arc Ecosystem
             </span>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="mt-8 flex flex-wrap gap-4">
+            <Link
+              href="/send"
+              className="flex items-center gap-2 rounded-2xl border border-sky-500/30 bg-sky-500/10 px-5 py-3 font-semibold text-sky-300 transition hover:bg-sky-500/20"
+            >
+              <ArrowUpRight size={18} />
+              Send
+            </Link>
+
+            <Link
+              href="/receive"
+              className="flex items-center gap-2 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-5 py-3 font-semibold text-emerald-300 transition hover:bg-emerald-500/20"
+            >
+              <ArrowDownLeft size={18} />
+              Receive
+            </Link>
+
+            <Link
+              href="/swap"
+              className="flex items-center gap-2 rounded-2xl border border-violet-500/30 bg-violet-500/10 px-5 py-3 font-semibold text-violet-300 transition hover:bg-violet-500/20"
+            >
+              <RefreshCw size={18} />
+              Swap
+            </Link>
           </div>
         </div>
 

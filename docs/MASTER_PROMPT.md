@@ -1,0 +1,1 @@
+[text](../../../../Downloads/MASTER_PROMPT.md)
