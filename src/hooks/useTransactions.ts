@@ -11,6 +11,7 @@ export type Transaction = {
   asset: string;
   value: number;
   category: string;
+  chain: string;
   metadata: {
     blockTimestamp: string;
   };
@@ -43,9 +44,28 @@ export function useTransactions() {
 
         const data = await response.json();
 
-        setTransactions(data);
+        const normalized: Transaction[] = (Array.isArray(data) ? data : []).map(
+          (tx) => ({
+            hash: tx.hash,
+            from: tx.from,
+            to: tx.to,
+            asset: tx.asset ?? "Unknown",
+            value: Number(tx.value ?? 0),
+            category: tx.category ?? "external",
+            chain: tx.chain ?? tx.network ?? "Base",
+            metadata: {
+              blockTimestamp:
+                tx.metadata?.blockTimestamp ??
+                tx.blockTimestamp ??
+                new Date().toISOString(),
+            },
+          })
+        );
+
+        setTransactions(normalized);
       } catch (error) {
         console.error(error);
+        setTransactions([]);
       } finally {
         setLoading(false);
       }
@@ -53,6 +73,9 @@ export function useTransactions() {
 
     if (isConnected) {
       loadTransactions();
+    } else {
+      setTransactions([]);
+      setLoading(false);
     }
   }, [address, isConnected]);
 

@@ -35,7 +35,9 @@ export default function PortfolioAllocationChart({
       value: Number(item.value.toFixed(2)),
     }));
 
-  if (!chartData.length) return null;
+  if (!chartData.length) {
+    return null;
+  }
 
   return (
     <div className="mt-6 rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
@@ -51,9 +53,10 @@ export default function PortfolioAllocationChart({
               dataKey="value"
               nameKey="name"
               outerRadius={95}
-              label={({ name, percent }) =>
-                `${name} ${(percent * 100).toFixed(0)}%`
-              }
+              label={({ name, percent }) => {
+                const percentage = ((percent ?? 0) * 100).toFixed(0);
+                return `${name} ${percentage}%`;
+              }}
             >
               {chartData.map((_, index) => (
                 <Cell
@@ -64,9 +67,10 @@ export default function PortfolioAllocationChart({
             </Pie>
 
             <Tooltip
-              formatter={(value: number) =>
-                `$${value.toLocaleString()}`
-              }
+              formatter={(value) => [
+                `$${Number(value).toLocaleString()}`,
+                "Value",
+              ]}
             />
           </PieChart>
         </ResponsiveContainer>

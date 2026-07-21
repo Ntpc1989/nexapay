@@ -45,20 +45,23 @@ export function PortfolioCard() {
 
         let price = 0;
 
-        switch (token.symbol) {
-          case "USDC":
-            price = prices.usdCoin;
-            break;
+   switch (token.symbol as string) {
+  case "USDC":
+    price = prices.usdCoin;
+    break;
 
-          case "USDT":
-            price = prices.tether;
-            break;
+  case "USDT":
+    price = prices.tether;
+    break;
 
-          case "ETH":
-          case "WETH":
-            price = prices.ethereum;
-            break;
-        }
+  case "ETH":
+  case "WETH":
+    price = prices.ethereum;
+    break;
+
+  default:
+    price = 0;
+}
 
         return {
           symbol: token.symbol,
