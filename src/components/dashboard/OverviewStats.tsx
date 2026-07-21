@@ -1,13 +1,14 @@
 "use client";
 
-import Card from "@/components/ui/Card";
 import { useMemo } from "react";
 import {
-  Wallet,
   Coins,
   Globe,
   TrendingUp,
+  Wallet,
 } from "lucide-react";
+
+import Card from "@/components/ui/Card";
 
 import { useWallet } from "@/hooks/useWallet";
 import { useTokenBalances } from "@/hooks/useTokenBalances";
@@ -27,7 +28,7 @@ export function OverviewStats() {
       ? prices?.polygon ?? 0
       : prices?.ethereum ?? 0;
 
-  const totalValue = useMemo(() => {
+  const portfolioValue = useMemo(() => {
     if (!prices) {
       return nativeBalance * nativePrice;
     }
@@ -35,11 +36,11 @@ export function OverviewStats() {
     let total = nativeBalance * nativePrice;
 
     for (const token of balances) {
-      const balance = Number(token.balance);
+      const amount = Number(token.balance);
 
       let price = 0;
 
-      switch (token.symbol as string) {
+      switch (token.symbol) {
         case "USDC":
           price = prices.usdCoin;
           break;
@@ -48,7 +49,6 @@ export function OverviewStats() {
           price = prices.tether;
           break;
 
-        case "ETH":
         case "WETH":
           price = prices.ethereum;
           break;
@@ -57,44 +57,55 @@ export function OverviewStats() {
           price = 0;
       }
 
-      total += balance * price;
+      total += amount * price;
     }
 
     return total;
   }, [balances, nativeBalance, nativePrice, prices]);
 
-  const stats = [
+  const cards = [
     {
-      title: "Portfolio Value",
-      value: loading ? "..." : `$${totalValue.toFixed(2)}`,
-      subtitle: wallet.isConnected
-        ? "Live Wallet"
-        : "Connect Wallet",
+      title: "Portfolio",
+      value: loading
+        ? "..."
+        : `$${portfolioValue.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}`,
+      subtitle: "Live portfolio value",
       icon: TrendingUp,
-      color: "text-emerald-400",
+      gradient: "from-emerald-500/20 to-emerald-500/5",
+      iconColor: "text-emerald-400",
     },
     {
       title: "Assets",
-      value: String(balances.length + (nativeBalance > 0 ? 1 : 0)),
-      subtitle: "Detected Assets",
+      value: String(
+        balances.length + (nativeBalance > 0 ? 1 : 0),
+      ),
+      subtitle: "Tracked assets",
       icon: Coins,
-      color: "text-yellow-400",
+      gradient: "from-amber-500/20 to-amber-500/5",
+      iconColor: "text-amber-400",
     },
     {
       title: "Network",
       value: wallet.chain?.name ?? "--",
-      subtitle: "Connected Chain",
+      subtitle: "Connected chain",
       icon: Globe,
-      color: "text-sky-400",
+      gradient: "from-sky-500/20 to-sky-500/5",
+      iconColor: "text-sky-400",
     },
     {
       title: "Wallet",
-      value: wallet.isConnected ? "Connected" : "Offline",
+      value: wallet.isConnected
+        ? "Connected"
+        : "Offline",
       subtitle: wallet.isConnected
         ? "Ready"
-        : "Not Connected",
+        : "Not connected",
       icon: Wallet,
-      color: wallet.isConnected
+      gradient: "from-violet-500/20 to-violet-500/5",
+      iconColor: wallet.isConnected
         ? "text-violet-400"
         : "text-red-400",
     },
@@ -102,29 +113,42 @@ export function OverviewStats() {
 
   return (
     <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
-      {stats.map((item) => {
-        const Icon = item.icon;
+      {cards.map((card) => {
+        const Icon = card.icon;
 
         return (
-          <Card key={item.title}>
-            <div className="flex items-center justify-between">
+          <Card
+            key={card.title}
+            className="group relative overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.05] p-6 transition-all duration-300 hover:-translate-y-1 hover:border-sky-400/20 hover:bg-white/[0.08]"
+          >
+            <div
+              className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-60`}
+            />
+
+            <div className="relative flex items-start justify-between">
               <div>
-                <p className="text-sm text-zinc-400">
-                  {item.title}
+                <p className="text-sm font-medium text-slate-400">
+                  {card.title}
                 </p>
 
-                <h3 className="mt-2 text-3xl font-bold text-white">
-                  {item.value}
+                <h3 className="mt-3 text-3xl font-bold tracking-tight text-white">
+                  {card.value}
                 </h3>
 
-                <p className={`mt-2 text-sm ${item.color}`}>
-                  {item.subtitle}
+                <p className="mt-3 text-sm text-slate-400">
+                  {card.subtitle}
                 </p>
               </div>
 
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/5">
-                <Icon className={`h-7 w-7 ${item.color}`} />
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl transition-transform duration-300 group-hover:scale-110">
+                <Icon
+                  className={`h-7 w-7 ${card.iconColor}`}
+                />
               </div>
+            </div>
+
+            <div className="relative mt-6 h-1 overflow-hidden rounded-full bg-white/5">
+              <div className="h-full w-3/4 rounded-full bg-gradient-to-r from-sky-400 via-cyan-400 to-violet-500" />
             </div>
           </Card>
         );
