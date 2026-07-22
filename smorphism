@@ -1,0 +1,15 @@
+* [33m522447c[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m docs: add AI development system
+* [33m12b9f77[m feat: redesign hero section and overview stats for Vyxel v2
+* [33mf7a9ba6[m feat: redesign hero section for Vyxel v2
+* [33mbc0c668[m feat: rebrand application to Vyxel
+* [33mf651755[m feat: introduce Vyxel v2 global premium design system
+* [33m8d09a29[m Add detailed Alchemy error logging
+* [33m8d73006[m feat: add native send transaction hook
+* [33m53fb13a[m docs: add NexaPay master project prompt
+* [33mf26782a[m feat: add send crypto page and live asset selector
+* [33m9f8eda3[m ui: upgrade portfolio allocation chart
+* [33me2342d4[m ui: compact premium transaction history
+* [33mc723d87[m feat: replace fake overview stats with live data
+* [33m7299f22[m fix: resolve production build and type errors
+* [33m46a30f0[m feat: upgrade dashboard UI and portfolio experience
+* [33mb00c9dd[m feat: upgrade PortfolioCard to premium glassmorphism UI with robust loading states and responsive grid
